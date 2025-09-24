@@ -7,7 +7,7 @@ namespace Server.Data
 	public class EfContext : DbContext
 	{
 		public EfContext(DbContextOptions<EfContext> options) : base(options) { }
-		
+
 		public virtual DbSet<Store> Stores { get; set; }
 		public virtual DbSet<Aisle> Aisles { get; set; }
 		public virtual DbSet<Bay> Bays { get; set; }

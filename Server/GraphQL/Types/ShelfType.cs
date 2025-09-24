@@ -16,7 +16,6 @@ namespace Server.GraphQL.Types
 				 var loader = ctx.DataLoader<ProductsByShelfIdLoader>();
 				 return await loader.LoadAsync(shelf.Id, ct);
 			 })
-			 .UsePaging()
 			 .UseFiltering()
 			 .UseSorting();
 		}

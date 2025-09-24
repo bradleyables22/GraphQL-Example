@@ -8,7 +8,7 @@ namespace Server.GraphQL.DataLoaders
 	public class ShelvesByBayIdLoader: GroupedDataLoader<string, Shelf>
 	{
 		private readonly IDbContextFactory<EfContext> _factory;
-		public ShelvesByBayIdLoader(IBatchScheduler batchScheduler, DataLoaderOptions options,, IDbContextFactory<EfContext> factory) : base(batchScheduler, options)
+		public ShelvesByBayIdLoader(IBatchScheduler batchScheduler, DataLoaderOptions options, IDbContextFactory<EfContext> factory) : base(batchScheduler, options)
 		{
 			_factory = factory;
 		}
