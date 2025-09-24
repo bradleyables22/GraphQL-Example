@@ -14,7 +14,6 @@ builder.Services.AddPooledDbContextFactory<EfContext>(options =>
 builder.Services.AddHostedService<DataSeeder>();
 
 //this solves for the graphql n+1 issue with ef. preloads and caches id lookups (green donut)
-//FYI at the moment to populate nested items the end user must select the parent id for the mapping to work
 builder.Services.AddDataLoader<AislesByStoreIdLoader>();
 builder.Services.AddDataLoader<BaysByAisleIdLoader>();
 builder.Services.AddDataLoader<ShelvesByBayIdLoader>();
@@ -30,8 +29,7 @@ builder.Services.AddGraphQLServer()
 	.AddType<ProductType>()
 	.AddType<CategoryType>()
 	.AddFiltering()
-	.AddSorting()
-	.AddProjections();
+	.AddSorting();
 
 var app = builder.Build();
 

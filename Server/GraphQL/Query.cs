@@ -6,7 +6,7 @@ namespace Server.GraphQL
 {
 	public class Query
 	{
-		[UseProjection, UseFiltering, UseSorting]
+		[ UseFiltering, UseSorting]
 		public async Task<IQueryable<Store>> GetStores([Service] IDbContextFactory<EfContext> _factory) 
 		{
 			var _db = await _factory.CreateDbContextAsync();
