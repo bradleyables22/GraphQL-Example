@@ -18,5 +18,7 @@ namespace Server.Data.Models
 		public string? BayId { get; set; }
 
 		public Bay? Bay { get; set; }
+
+		public ICollection<Product>? Products { get; set; }
 	}
 }
