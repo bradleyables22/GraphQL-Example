@@ -23,6 +23,7 @@ builder.Services.AddDataLoader<ProductsbyCategoryIdLoader>();
 
 builder.Services.AddGraphQLServer()
 	.AddQueryType<Query>()
+	.AddMutationType<Mutation>()
 	.AddType<StoreType>()
 	.AddType<AisleType>()
 	.AddType<BayType>()
