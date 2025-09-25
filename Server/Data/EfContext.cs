@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Data.Models;
-using System;
 
 namespace Server.Data
 {
@@ -14,6 +13,6 @@ namespace Server.Data
 		public virtual DbSet<Shelf> Shelves { get; set; }
 		public virtual DbSet<Product> Products { get; set; }
 		public virtual DbSet<Category> Categories { get; set; }
-
+		public virtual DbSet<ProductInventory> Inventory { get; set; }
 	}
 }

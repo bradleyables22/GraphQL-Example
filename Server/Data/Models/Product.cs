@@ -14,17 +14,11 @@ namespace Server.Data.Models
 		public DateTimeOffset DB_CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 		public DateTimeOffset DB_LastUpdateAt { get; set; } = DateTimeOffset.UtcNow;
 
-		[ForeignKey("Shelf")]
-		public string? ShelfId { get; set; }
-
-		public Shelf? Shelf { get; set; }
-
 		[ForeignKey("Category")]
 		public string? CategoryId { get; set; }
 
 		public Category? Category { get; set; }
-
-		public int Quantity { get; set; }
+		public ICollection<ProductInventory>? Inventory { get; set; }
 
 	}
 }

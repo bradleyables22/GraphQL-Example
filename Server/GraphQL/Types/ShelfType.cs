@@ -9,11 +9,11 @@ namespace Server.GraphQL.Types
 		protected override void Configure(IObjectTypeDescriptor<Shelf> s)
 		{
 			s.Field(x => x.Bay).Ignore(); //ignore parent
-			s.Field(x => x.Products) // use preloaded data
+			s.Field(x => x.Inventory) // use preloaded data
 			 .Resolve(async (ctx, ct) =>
 			 {
 				 var shelf = ctx.Parent<Shelf>();
-				 var loader = ctx.DataLoader<ProductsByShelfIdLoader>();
+				 var loader = ctx.DataLoader<InventoryByShelfIdLoader>();
 				 return await loader.LoadAsync(shelf.Id, ct);
 			 })
 			 .UseFiltering()

@@ -17,7 +17,8 @@ builder.Services.AddHostedService<DataSeeder>();
 builder.Services.AddDataLoader<AislesByStoreIdLoader>();
 builder.Services.AddDataLoader<BaysByAisleIdLoader>();
 builder.Services.AddDataLoader<ShelvesByBayIdLoader>();
-builder.Services.AddDataLoader<ProductsByShelfIdLoader>();
+builder.Services.AddDataLoader<InventoryByProductIdLoader>();
+builder.Services.AddDataLoader<InventoryByShelfIdLoader>();
 builder.Services.AddDataLoader<ProductsbyCategoryIdLoader>();
 
 builder.Services.AddGraphQLServer()
@@ -28,8 +29,14 @@ builder.Services.AddGraphQLServer()
 	.AddType<ShelfType>()
 	.AddType<ProductType>()
 	.AddType<CategoryType>()
+	.AddType<InventoryType>()
 	.AddFiltering()
-	.AddSorting();
+	.AddSorting()
+	.ModifyCostOptions(o => 
+	{
+		o.SkipAnalyzer = true; //just for testing
+	})
+;
 
 var app = builder.Build();
 

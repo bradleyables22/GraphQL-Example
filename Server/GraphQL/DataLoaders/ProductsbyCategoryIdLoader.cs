@@ -17,10 +17,10 @@ namespace Server.GraphQL.DataLoaders
 		{
 			using var _db = await _factory.CreateDbContextAsync(cancellationToken);
 
-			var bays = await _db.Products.AsNoTracking()
+			var products = await _db.Products.AsNoTracking()
 				.ToListAsync(cancellationToken);
 
-			return bays.ToLookup(x => x.CategoryId!);
+			return products.ToLookup(x => x.CategoryId!);
 		}
 	}
 }

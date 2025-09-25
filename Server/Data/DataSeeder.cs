@@ -1,5 +1,5 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Server.Data.Models;
 
 namespace Server.Data
@@ -7,44 +7,113 @@ namespace Server.Data
 	public class DataSeeder : BackgroundService
 	{
 		private readonly IDbContextFactory<EfContext> _factory;
+
 		public DataSeeder(IDbContextFactory<EfContext> factory)
 		{
 			_factory = factory;
 		}
+
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			using var db = await _factory.CreateDbContextAsync(stoppingToken);
+			await using var db = await _factory.CreateDbContextAsync(stoppingToken);
 
+			var cat1 = new Category { Name = "Category 1" };
+			var cat2 = new Category { Name = "Category 2" };
 
-			var catAccessories = new Category { Name = "Accessories" };
-			var catShoes = new Category { Name = "Shoes" };
+			var products = new List<Product>(capacity: 100);
+			foreach (var productNum in Enumerable.Range(0, 100))
+			{
+				var p = new Product
+				{
+					Name = $"Product {productNum}"
+				};
+				products.Add(p);
 
-			var store = new Store { Name = "Main Street 001" };
+				if (productNum % 2 == 0)
+				{
+					(cat1.Products ??= new List<Product>()).Add(p);
+				}
+				else
+				{
+					(cat2.Products ??= new List<Product>()).Add(p);
+				}
+			}
 
-			var aisle1 = new Aisle { Alias = "Aisle 01", Store = store };
-			var aisle2 = new Aisle { Alias = "Aisle 02", Store = store };
+			var stores = new List<Store>(capacity: 10);
+			foreach (var storeNum in Enumerable.Range(0, 10))
+			{
+				var store = new Store
+				{
+					Name = $"Store {storeNum}",
+					Aisles = new List<Aisle>(capacity: 10)
+				};
 
-			var bay1A = new Bay { Alias = "Bay A", Aisle = aisle1 };
-			var bay1B = new Bay { Alias = "Bay B", Aisle = aisle1 };
-			var bay2A = new Bay { Alias = "Bay A", Aisle = aisle2 };
+				foreach (var aisleNum in Enumerable.Range(0, 10))
+				{
+					var aisleLetter = aisleNum % 2 == 0 ? "A" : "B";
+					var aisle = new Aisle
+					{
+						Alias = $"Aisle {aisleNum}{aisleLetter}",
+						Bays = new List<Bay>(capacity: 10)
+					};
 
-			var shelf1 = new Shelf { Alias = "Shelf 01", Bay = bay1A };
-			var shelf2 = new Shelf { Alias = "Shelf 02", Bay = bay1A };
-			var shelf3 = new Shelf { Alias = "Shelf 03", Bay = bay1B };
-			var shelf4 = new Shelf { Alias = "Shelf 04", Bay = bay2A };
+					foreach (var bayNum in Enumerable.Range(0, 10))
+					{
+						var bayLetter = bayNum % 2 == 0 ? "A" : "B";
+						var bay = new Bay
+						{
+							Alias = $"Bay {bayNum}{bayLetter}",
+							Shelves = new List<Shelf>(capacity: 5)
+						};
 
-			var p1 = new Product { Name = "Classic Belt", Category = catAccessories, Shelf = shelf1, Quantity = 25 };
-			var p2 = new Product { Name = "Runner 2000 Shoe", Category = catShoes, Shelf = shelf2, Quantity = 12 };
-			var p3 = new Product { Name = "Wool Beanie Hat", Category = catAccessories, Shelf = shelf3, Quantity = 18 };
+						foreach (var shelfNum in Enumerable.Range(0, 5))
+						{
+							var shelf = new Shelf
+							{
+								Alias = $"Shelf {shelfNum}",
+								Inventory = new List<ProductInventory>() 
+							};
 
-			db.AddRange(
-				store, aisle1, aisle2,
-				bay1A, bay1B, bay2A,
-				shelf1, shelf2, shelf3, shelf4,
-				catAccessories, catShoes,
-				p1, p2, p3
-			);
+							bay.Shelves.Add(shelf);
+						}
 
+						aisle.Bays.Add(bay);
+					}
+
+					store.Aisles.Add(aisle);
+				}
+
+				stores.Add(store);
+			}
+
+			db.Categories.AddRange(cat1, cat2);
+			db.Products.AddRange(products);
+			db.Stores.AddRange(stores);
+
+			await db.SaveChangesAsync(stoppingToken);
+
+			var rng = new Random(12345); 
+			var allShelves = await db.Shelves.AsNoTracking().ToListAsync(stoppingToken);
+
+			var inventories = new List<ProductInventory>(capacity: allShelves.Count * 6);
+			foreach (var shelf in allShelves)
+			{
+				var takeCount = rng.Next(3, 11); 
+												 
+				foreach (var product in products.OrderBy(_ => rng.Next()).Take(takeCount))
+				{
+					inventories.Add(new ProductInventory
+					{
+						ShelfId = shelf.Id,
+						ProductId = product.Id,
+						OnHand = rng.Next(1, 51), 
+						DB_CreatedAt = DateTimeOffset.UtcNow,
+						DB_LastUpdateAt = DateTimeOffset.UtcNow
+					});
+				}
+			}
+
+			db.Inventory.AddRange(inventories);
 			await db.SaveChangesAsync(stoppingToken);
 		}
 	}

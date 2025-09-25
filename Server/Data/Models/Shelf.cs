@@ -19,6 +19,6 @@ namespace Server.Data.Models
 
 		public Bay? Bay { get; set; }
 
-		public ICollection<Product>? Products { get; set; }
+		public ICollection<ProductInventory>? Inventory{ get; set; }
 	}
 }
